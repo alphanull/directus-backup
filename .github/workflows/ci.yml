@@ -68,7 +68,10 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     # Report-only: surfaces vulnerable dependencies without blocking the
-    # pipeline. Dependabot handles the actual updates.
+    # pipeline. Audits production dependencies only (--omit=dev): build-time
+    # devDependencies (e.g. @directus/extensions-sdk and its transitive deps)
+    # never ship in the published package or the Docker image, so their
+    # advisories would only add noise here.
     continue-on-error: true
     strategy:
       matrix:
@@ -79,7 +82,7 @@ jobs:
         with:
           node-version: 22
       - name: Audit dependencies (report only)
-        run: npm audit
+        run: npm audit --omit=dev
         working-directory: ${{ matrix.path }}
 
   coverage:
