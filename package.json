@@ -1,0 +1,42 @@
+{
+  "name": "@alphanull/directus-backup",
+  "version": "0.9.0",
+  "private": true,
+  "type": "module",
+  "description": "Full backup and restore system for Directus — sidecar container + UI extension",
+  "keywords": [
+    "directus-extension",
+    "directus",
+    "docker",
+    "backup",
+    "restore"
+  ],
+  "scripts": {
+    "lint": "eslint . && stylelint \"**/*.{css,scss,vue}\" --ignore-path .gitignore",
+    "test": "npm --prefix packages/sidecar test && npm --prefix packages/extension test",
+    "typecheck": "npm --prefix packages/sidecar run typecheck && npm --prefix packages/extension run typecheck",
+    "check-versions": "node scripts/check-versions.mjs",
+    "set-version": "node scripts/set-version.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alphanull/directus-backup.git"
+  },
+  "author": "Frank Kudermann <kudermann@alphanull.de>",
+  "license": "AGPL-3.0-only",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@stylistic/stylelint-plugin": "^5.2.0",
+    "eslint": "^10.4.1",
+    "eslint-plugin-jsdoc": "^63.0.2",
+    "eslint-plugin-vue": "^10.9.2",
+    "globals": "^17.6.0",
+    "postcss-html": "^1.8.1",
+    "stylelint": "^17.12.0",
+    "stylelint-order": "^8.1.1",
+    "stylelint-scss": "^7.2.0",
+    "typescript-eslint": "^8.60.1",
+    "vue-eslint-parser": "^10.4.1"
+  }
+}

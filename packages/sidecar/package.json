@@ -1,0 +1,40 @@
+{
+  "name": "@alphanull/directus-backup-sidecar",
+  "version": "0.9.0",
+  "private": true,
+  "type": "module",
+  "description": "Backup sidecar for Directus",
+  "keywords": [
+    "directus-extension",
+    "directus",
+    "docker",
+    "backup",
+    "restore"
+  ],
+  "license": "AGPL-3.0-only",
+  "author": "Frank Kudermann <kudermann@alphanull.de>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alphanull/directus-backup.git",
+    "directory": "packages/sidecar"
+  },
+  "scripts": {
+    "test": "vitest run && npm run test:adapters && npm run test:runner",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:adapters": "sh test/adapters/postgres-restore.test.sh",
+    "test:runner": "sh test/runner/restore-result.test.sh && sh test/runner/path-decoupling.test.sh",
+    "typecheck": "tsc --noEmit -p jsconfig.json"
+  },
+  "dependencies": {
+    "dockerode": "^5.0.0",
+    "node-cron": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/dockerode": "^4.0.1",
+    "@types/node": "^25.9.2",
+    "@vitest/coverage-v8": "^4.1.8",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  }
+}

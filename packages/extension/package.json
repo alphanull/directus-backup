@@ -1,0 +1,71 @@
+{
+  "name": "@alphanull/directus-extension-backup",
+  "version": "0.9.0",
+  "description": "Backup & restore UI for Directus — admin module + API proxy to the backup sidecar",
+  "keywords": [
+    "directus-extension",
+    "directus",
+    "docker",
+    "backup",
+    "restore"
+  ],
+  "icon": "backup",
+  "license": "AGPL-3.0-only",
+  "author": "Frank Kudermann <kudermann@alphanull.de>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alphanull/directus-backup.git",
+    "directory": "packages/extension"
+  },
+  "homepage": "https://github.com/alphanull/directus-backup",
+  "bugs": {
+    "url": "https://github.com/alphanull/directus-backup/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "directus:extension": {
+    "type": "bundle",
+    "path": {
+      "app": "dist/app.js",
+      "api": "dist/api.js"
+    },
+    "entries": [
+      {
+        "type": "module",
+        "name": "backup-module",
+        "source": "src/module/index.ts"
+      },
+      {
+        "type": "endpoint",
+        "name": "backup-api",
+        "source": "src/api/index.ts"
+      }
+    ],
+    "host": "^11.0.0"
+  },
+  "scripts": {
+    "prebuild": "npm run typecheck",
+    "build": "directus-extension build --no-minify",
+    "dev": "directus-extension build -w --no-minify",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "^17.1.4",
+    "@vitest/coverage-v8": "^4.1.8",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8",
+    "vue": "^3.5.35",
+    "vue-i18n": "^11.4.5"
+  }
+}
