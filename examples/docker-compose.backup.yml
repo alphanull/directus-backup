@@ -38,8 +38,11 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-    networks:
-      - internal
+    # The backup service must share a Docker network with your Directus service
+    # so it can reach http://directus:8055. In a single Compose project the
+    # default network already provides this. Only add an explicit `networks:`
+    # block here if your stack uses a custom network — and make sure the
+    # directus service is attached to that same network.
 
   # Add these env vars to your existing Directus service:
   # directus:

@@ -36,21 +36,28 @@ volumes:
 
 ### Sidecar port exposure
 
-> **Warning:** The sidecar listens on all interfaces (`0.0.0.0:4700`). `BACKUP_SECRET` is the **only** protection. If this port is reachable from outside the internal Docker network, the entire backup system — including all backup data and the restore endpoint — is accessible to anyone who obtains or brute-forces the secret.
+> **Warning:** The sidecar listens on all interfaces (`0.0.0.0:4700`) inside its container. `BACKUP_SECRET` is the **only** protection. If this port is reachable from outside the Docker network, the entire backup system — including all backup data and the restore endpoint — is accessible to anyone who obtains or brute-forces the secret.
 
-**Required:** bind the sidecar to an internal-only Docker network. Do **not** publish port 4700 to the host or the internet.
-
-```yaml
-networks:
-  - internal  # sidecar must be on an internal-only network
-```
-
-Never publish the port:
+**Required — never publish port 4700.** This is the single control that keeps the sidecar unreachable from the host and the internet. A container is reachable from outside the Docker network **only** if a host port is published via `ports:`; without that, port 4700 stays confined to the Docker network. So simply omit any `ports:` mapping for the `backup` service:
 
 ```yaml
-# DO NOT do this:
+# DO NOT do this — it exposes the sidecar to the host/internet:
 ports:
   - "4700:4700"
+```
+
+The `backup` service still has to share a Docker network with Directus so it can reach `http://directus:8055`. In a single Compose project the default network already provides this — no explicit `networks:` entry is needed, and the network *name* has no security effect on its own.
+
+**Optional hardening (egress isolation).** Not publishing the port blocks inbound access; it does **not** stop the sidecar from making *outbound* connections. To also cut off outbound traffic, place the sidecar (and the services it must reach — Directus, database, cache) on a dedicated network declared `internal: true`. Note this removes internet access for every service on that network:
+
+```yaml
+services:
+  backup:
+    networks:
+      - internal
+networks:
+  internal:
+    internal: true  # no traffic in or out of this network's external gateway
 ```
 
 ## Authentication & Authorization

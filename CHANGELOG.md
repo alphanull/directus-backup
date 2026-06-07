@@ -6,6 +6,18 @@ This project adheres to [Semantic Versioning](https://semver.org) and follows th
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- Add-on Compose examples (README quick start, `installation.md` step 1, `examples/docker-compose.backup.yml`) referenced an undefined `internal` network, which broke `docker compose` when merged into a stack on the default network
+
+### Changed
+
+- Clarified network-security docs: not publishing port 4700 is the ingress control; `internal: true` is optional egress hardening
+
+---
+
 ## [0.9.0] – 2026-06-06
 
 ### Added

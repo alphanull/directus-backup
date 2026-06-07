@@ -42,11 +42,11 @@ backup:
     interval: 30s
     timeout: 5s
     retries: 3
-  networks:
-    - internal
 ```
 
 Adjust volume paths to match your Directus setup. The sidecar needs access to the same uploads and extensions directories as Directus.
+
+The `backup` service must be on the **same Docker network as Directus** so it can reach `http://directus:8055`. In a single Compose project the default network handles this automatically — only add an explicit `networks:` block if your stack uses a custom network (and make sure the `directus` service is attached to it as well). The sidecar deliberately publishes **no host port**: it is reachable only from within the Docker network, never from outside.
 
 ## Step 2 — Install the Extension
 

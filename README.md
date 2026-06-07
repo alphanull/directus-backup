@@ -73,9 +73,9 @@ backup:
     interval: 30s
     timeout: 5s
     retries: 3
-  networks:
-    - internal
 ```
+
+> The `backup` service must share a Docker network with Directus so it can reach `http://directus:8055`; in a single Compose project the default network does this automatically. Never publish port `4700` to the host — that (not the network name) is what keeps the sidecar unreachable from outside. See [Network Security](docs/security.md#network-security).
 
 **2. Install the extension** — either via the Directus Marketplace (search for `backup`; requires `MARKETPLACE_TRUST=all`, since the API endpoint is not sandboxed) or by copying the built extension into `extensions/directus-extension-backup/`. See [Installation](docs/installation.md) for both methods.
 
