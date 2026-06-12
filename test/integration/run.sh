@@ -482,12 +482,27 @@ esac
 DB_PASSWORD=$(grep '^DB_PASSWORD=' "$ENV_FILE" | cut -d= -f2-)
 
 echo "  Disaster: dropping the database schema..."
-docker compose exec -T -e PGPASSWORD="$DB_PASSWORD" database \
-    psql -U directus -d directus -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' >/dev/null 2>&1 \
-    && echo "    schema dropped" || echo "    (drop returned nonzero — continuing)"
+DROP_LOG=$(mktemp)
+if docker compose exec -T -e PGPASSWORD="$DB_PASSWORD" database \
+    psql -U directus -d directus -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' >"$DROP_LOG" 2>&1; then
+    echo "    schema dropped"
+else
+    fail "Database schema drop failed"
+    sed 's/^/    drop: /' "$DROP_LOG" 2>/dev/null || true
+fi
+rm -f "$DROP_LOG"
 
-DEAD_TOKEN=$(login)
-if [ -z "$DEAD_TOKEN" ] || [ "$DEAD_TOKEN" = "null" ]; then
+DEAD_TOKEN=""
+LOGIN_FAILED=0
+for _ in $(seq 1 10); do
+    DEAD_TOKEN=$(login)
+    if [ -z "$DEAD_TOKEN" ] || [ "$DEAD_TOKEN" = "null" ]; then
+        LOGIN_FAILED=1
+        break
+    fi
+    sleep 2
+done
+if [ "$LOGIN_FAILED" -eq 1 ]; then
     pass "Login fails after database destruction (as expected)"
 else
     fail "Login still succeeds after dropping the schema"
