@@ -72,7 +72,7 @@ if [ "$BACKUP_INCLUDE_EXTENSIONS" = "1" ]; then
   if [ -d "$EXTENSIONS_DIR" ]; then
     (
       cd "$EXTENSIONS_DIR" || exit 1
-      [ -d ".registry" ] && find .registry
+      [ -d ".registry" ] && find .registry \( -type f -o -type l -o -type d -empty \) -print
       for ext_dir in */; do
         [ -d "$ext_dir" ] || continue
         ext_name=${ext_dir%/}
