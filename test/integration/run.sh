@@ -300,7 +300,7 @@ printf '{"id":"%s","status":"success","scope":{"database":true,"assets":false,"e
     "$HL_ID" > "$HL_DIR/$HL_ID/backup.json"
 echo "FAKE_DUMP" > "$HL_DIR/$HL_ID/database.dump"
 ln "$HL_DIR/$HL_ID/database.dump" "$HL_DIR/$HL_ID/hardlink.dump"
-tar czf "$HL_DIR/hardlink.tar.gz" -C "$HL_DIR" "$HL_ID"
+COPYFILE_DISABLE=1 tar czf "$HL_DIR/hardlink.tar.gz" -C "$HL_DIR" "$HL_ID"
 
 HL_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
     -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/gzip" \

@@ -3203,9 +3203,11 @@ function validateTarListing(listing) {
     const parts = entry.trim().split(/\s+/);
     if (parts.length < 6) continue;
     const permissions = parts[0];
-    const filename = parts.slice(5).join(" ").split(" -> ")[0];
+    const rawFilename = parts.slice(5).join(" ");
+    const filename = rawFilename.split(" -> ")[0];
     if (permissions[0] === "l") return "Archive contains symlinks (security risk)";
     if (permissions[0] === "h") return "Archive contains hard links (security risk)";
+    if (rawFilename.includes(" -> ")) return "Archive contains hard links (security risk)";
     if ("bcps".includes(permissions[0])) return "Archive contains device files, pipes, or sockets (security risk)";
     if (filename.startsWith("/") || filename.includes("..")) return "Archive contains unsafe paths";
   }
@@ -3294,12 +3296,17 @@ async function handleImport(req, res) {
       const parts = entry.trim().split(/\s+/);
       if (parts.length < 6) continue;
       const permissions = parts[0];
-      const filename = parts.slice(5).join(" ").split(" -> ")[0];
+      const rawFilename = parts.slice(5).join(" ");
+      const filename = rawFilename.split(" -> ")[0];
       if (permissions[0] === "l") {
         res.status(400).json({ error: "Archive contains symlinks (security risk)" });
         return;
       }
       if (permissions[0] === "h") {
+        res.status(400).json({ error: "Archive contains hard links (security risk)" });
+        return;
+      }
+      if (rawFilename.includes(" -> ")) {
         res.status(400).json({ error: "Archive contains hard links (security risk)" });
         return;
       }

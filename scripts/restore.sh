@@ -48,9 +48,14 @@ validate_inner_tar() {
     {
       perm = $1; first = substr(perm, 1, 1)
       file = ""; for (i = 6; i <= NF; i++) file = file (i > 6 ? " " : "") $i
+      rawfile = file
       sub(/ ->.*$/, "", file)
       if (index("lhbcps", first) > 0) {
         print "Inner archive contains unsafe entry (" first "): " file
+        exit 1
+      }
+      if (index(rawfile, " -> ") > 0) {
+        print "Inner archive contains unsafe hard link: " file
         exit 1
       }
       if (file ~ /^\// || file ~ /(^|\/)\.\.($|\/)/) {

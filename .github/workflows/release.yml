@@ -38,6 +38,11 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: Install
+        run: npm ci
       - name: Run integration tests
         run: bash test/integration/run.sh
 
