@@ -17,7 +17,7 @@
  * @license AGPL-3.0-only
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import { rm, mkdir, mkdtemp, writeFile, readFile, access, symlink, link, truncate } from 'node:fs/promises';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
@@ -25,6 +25,11 @@ import { tmpdir } from 'node:os';
 import { Readable } from 'node:stream';
 import { execFile, execFileSync } from 'node:child_process';
 import { promisify } from 'node:util';
+
+vi.mock('../../src/api/core/sanity.js', () => ({
+    getSanityReport: async () => ({ operational: true, ok: true, restoreReady: true, issues: [], checkedAt: '' }),
+    installationError: () => ''
+}));
 
 import backupApi from '../../src/api/index.js';
 import { acquireLock } from '../../src/api/storage/locks.js';
