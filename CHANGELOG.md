@@ -6,6 +6,14 @@ This project adheres to [Semantic Versioning](https://semver.org) and follows th
 
 ---
 
+## [0.10.1] – 2026-06-12
+
+### fixed
+
+- **Readme Screenshot** - changed screenshot link so display is not broken in directus marketplace
+
+---
+
 ## [0.10.0] – 2026-06-12
 
 ### Added
