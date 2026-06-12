@@ -1303,7 +1303,7 @@ function requireCreateId () {
 	    const id = Array.from(values, v => charset[v % charset.length]).join('');
 	    return prefix ? `${prefix}-${id}` : id;
 	}
-	
+
 	return createId;
 }
 
@@ -1369,7 +1369,7 @@ function requireLogger () {
 	    },
 	};
 	logger.default = logger$1;
-	
+
 	return logger;
 }
 
@@ -1433,7 +1433,7 @@ function requireTrackedPromise () {
 	    }
 	}
 	trackedPromise.TrackedPromise = TrackedPromise;
-	
+
 	return trackedPromise;
 }
 
@@ -1630,7 +1630,7 @@ function requireRunner () {
 	    date.setMilliseconds(0);
 	    return date;
 	}
-	
+
 	return runner;
 }
 
@@ -1664,7 +1664,7 @@ function requireMonthNamesConversion () {
 	    }
 	    return interprete;
 	})();
-	
+
 	return monthNamesConversion;
 }
 
@@ -1693,7 +1693,7 @@ function requireWeekDayNamesConversion () {
 	    }
 	    return convertWeekDays;
 	})();
-	
+
 	return weekDayNamesConversion;
 }
 
@@ -1723,7 +1723,7 @@ function requireAsteriskToRangeConversion () {
 	    }
 	    return convertAsterisksToRanges;
 	})();
-	
+
 	return asteriskToRangeConversion;
 }
 
@@ -1767,7 +1767,7 @@ function requireRangeConversion () {
 	    }
 	    return convertAllRanges;
 	})();
-	
+
 	return rangeConversion;
 }
 
@@ -1816,7 +1816,7 @@ function requireConvertion () {
 	    }
 	    return interprete;
 	})();
-	
+
 	return convertion;
 }
 
@@ -1906,7 +1906,7 @@ function requireLocalizedTime () {
 	    const minutes = Math.floor(offsetInMinutes % 60).toString().padStart(2, '0');
 	    return `GMT${sign}${hours}:${minutes}`;
 	}
-	
+
 	return localizedTime;
 }
 
@@ -2015,7 +2015,7 @@ function requireMatcherWalker () {
 	        return availableValues[0];
 	    return false;
 	}
-	
+
 	return matcherWalker;
 }
 
@@ -2063,7 +2063,7 @@ function requireTimeMatcher () {
 	    }
 	}
 	timeMatcher.TimeMatcher = TimeMatcher;
-	
+
 	return timeMatcher;
 }
 
@@ -2097,7 +2097,7 @@ function requireStateMachine () {
 	    }
 	}
 	stateMachine.StateMachine = StateMachine;
-	
+
 	return stateMachine;
 }
 
@@ -2248,7 +2248,7 @@ function requireInlineScheduledTask () {
 	    }
 	}
 	inlineScheduledTask.InlineScheduledTask = InlineScheduledTask;
-	
+
 	return inlineScheduledTask;
 }
 
@@ -2292,7 +2292,7 @@ function requireTaskRegistry () {
 	    }
 	}
 	taskRegistry.TaskRegistry = TaskRegistry;
-	
+
 	return taskRegistry;
 }
 
@@ -2362,7 +2362,7 @@ function requirePatternValidation () {
 	    validateFields(patterns, executablePatterns);
 	}
 	patternValidation.default = validate;
-	
+
 	return patternValidation;
 }
 
@@ -2591,7 +2591,7 @@ function requireBackgroundScheduledTask () {
 	    return err;
 	}
 	backgroundScheduledTask.default = BackgroundScheduledTask;
-	
+
 	return backgroundScheduledTask;
 }
 
@@ -2670,7 +2670,7 @@ function requireNodeCron () {
 		    getTask: exports$1.getTask,
 		};
 		exports$1.default = exports$1.nodeCron;
-		
+
 	} (nodeCron));
 	return nodeCron;
 }
@@ -3792,7 +3792,7 @@ function registerRoutes(router, context) {
  * {@link file://./restore/restore.ts} and executed by `restore.sh` after a
  * container restart.
  * @author  Frank Kudermann – alphanull
- * @version 0.10.0
+ * @version 0.10.1
  * @license AGPL-3.0-only
  */
 let startupDone = false;
