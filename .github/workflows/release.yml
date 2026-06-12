@@ -69,9 +69,16 @@ jobs:
       - name: Verify committed dist is up to date
         # The published package and source installs both consume the committed
         # dist/. Fail the release if a rebuild changes it, so stale artifacts
-        # (src/ changed without rebuilding dist/) can never be published.
+        # (src/ changed without rebuilding dist/) can never be published. Ignore
+        # whitespace-only bundle churn from platform/tooling differences.
         run: |
           if [ -n "$(git status --porcelain -- dist)" ]; then
+            if git diff --quiet --ignore-all-space -- dist; then
+              echo "::warning::Build changed dist/ whitespace only; continuing."
+              git status --porcelain -- dist
+              git --no-pager diff --stat -- dist
+              exit 0
+            fi
             echo "::error::Committed dist/ is out of date. Run 'npm run build' and commit the result."
             git status --porcelain -- dist
             git --no-pager diff -- dist
