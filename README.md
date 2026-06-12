@@ -21,7 +21,7 @@ Full backup and restore system for Directus. Create, schedule, download, upload,
 
 ## Screenshot
 
-![Backup list with status, size, and activity log](https://github.com/alphanull/directus-backup/blob/main/docs/images/screenshot.jpg?raw=true)
+![Backup list with status, size, and activity log](https://raw.githubusercontent.com/alphanull/directus-backup/main/docs/images/screenshot.jpg)
 
 ## How It Works
 
