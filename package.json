@@ -1,33 +1,80 @@
 {
-  "name": "@alphanull/directus-backup",
-  "version": "0.9.0",
-  "private": true,
-  "type": "module",
-  "description": "Full backup and restore system for Directus — sidecar container + UI extension",
+  "name": "@alphanull/directus-extension-backup",
+  "version": "0.10.0",
+  "description": "Self-contained backup & restore for Directus — admin module + API, no sidecar, no Docker socket",
   "keywords": [
     "directus-extension",
     "directus",
-    "docker",
     "backup",
     "restore"
   ],
-  "scripts": {
-    "lint": "eslint . && stylelint \"**/*.{css,scss,vue}\" --ignore-path .gitignore",
-    "test": "npm --prefix packages/sidecar test && npm --prefix packages/extension test",
-    "typecheck": "npm --prefix packages/sidecar run typecheck && npm --prefix packages/extension run typecheck",
-    "check-versions": "node scripts/check-versions.mjs",
-    "set-version": "node scripts/set-version.mjs"
-  },
+  "icon": "backup",
+  "license": "AGPL-3.0-only",
+  "author": "Frank Kudermann <kudermann@alphanull.de>",
   "repository": {
     "type": "git",
     "url": "https://github.com/alphanull/directus-backup.git"
   },
-  "author": "Frank Kudermann <kudermann@alphanull.de>",
-  "license": "AGPL-3.0-only",
+  "homepage": "https://github.com/alphanull/directus-backup",
+  "bugs": {
+    "url": "https://github.com/alphanull/directus-backup/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "files": [
+    "dist",
+    "scripts",
+    "docs/*.md",
+    "examples"
+  ],
+  "directus:extension": {
+    "type": "bundle",
+    "path": {
+      "app": "dist/app.js",
+      "api": "dist/api.js"
+    },
+    "entries": [
+      {
+        "type": "module",
+        "name": "backup-module",
+        "source": "src/module/index.ts"
+      },
+      {
+        "type": "endpoint",
+        "name": "backup-api",
+        "source": "src/api/index.ts"
+      }
+    ],
+    "host": "^11.0.0"
+  },
+  "scripts": {
+    "prebuild": "npm run typecheck",
+    "build": "directus-extension build --no-minify",
+    "dev": "directus-extension build -w --no-minify",
+    "lint": "eslint . && stylelint \"**/*.{css,scss,vue}\" --ignore-path .gitignore",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run && npm run test:adapters && npm run test:runner",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:adapters": "sh test/adapters/postgres-restore.test.sh",
+    "test:runner": "sh test/runner/restore-result.test.sh && sh test/runner/path-decoupling.test.sh && sh test/runner/recover-flag-env.test.sh && sh test/runner/restore-timeout.test.sh",
+    "test:integration": "bash test/integration/run.sh"
+  },
+  "dependencies": {
+    "node-cron": "^4.2.1"
+  },
   "devDependencies": {
+    "@directus/extensions-sdk": "^17.1.4",
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@stylistic/stylelint-plugin": "^5.2.0",
+    "@types/node": "^25.9.2",
+    "@vitest/coverage-v8": "^4.1.8",
     "eslint": "^10.4.1",
     "eslint-plugin-jsdoc": "^63.0.2",
     "eslint-plugin-vue": "^10.9.2",
@@ -36,7 +83,11 @@
     "stylelint": "^17.12.0",
     "stylelint-order": "^8.1.1",
     "stylelint-scss": "^7.2.0",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.60.1",
-    "vue-eslint-parser": "^10.4.1"
+    "vitest": "^4.1.8",
+    "vue": "^3.5.35",
+    "vue-eslint-parser": "^10.4.1",
+    "vue-i18n": "^11.4.5"
   }
 }

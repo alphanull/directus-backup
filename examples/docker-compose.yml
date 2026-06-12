@@ -1,0 +1,89 @@
+# Full standalone example: Directus + PostgreSQL + Redis with the backup
+# extension. No sidecar, no Docker socket — the restore runs in-container on the
+# next boot via the entrypoint stub + restore.sh.
+#
+# 1. Copy .env.example to .env and fill in the secrets.
+# 2. Install the extension (pick one):
+#      a) Marketplace: leave the extension bind-mount below commented out and set
+#         MARKETPLACE_TRUST=all on the directus service, then install from
+#         Settings -> Marketplace after first boot.
+#      b) From source: build the package once (`npm run build` in the extension
+#         directory) and enable the bind-mount below.
+# 3. Start: docker compose up -d --build
+# 4. Open http://localhost:8055, log in, enable the Backup module in
+#    Settings -> Modules, and find "Backup" in the sidebar.
+
+services:
+  database:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USER:-directus}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD required}
+      POSTGRES_DB: ${DB_DATABASE:-directus}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USER:-directus}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cache:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "[ $$(redis-cli ping) = 'PONG' ]"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  directus:
+    build: .                 # builds the Dockerfile in this directory
+    restart: unless-stopped  # REQUIRED — the restore restarts the container
+    ports:
+      - "8055:8055"
+    volumes:
+      - uploads:/directus/uploads
+      - extensions:/directus/extensions
+      - backups:/directus/backups
+      # From-source install (Option 2b): mount the built package. Requires
+      # `npm run build` (produces dist/) in the extension directory first.
+      # - ..:/directus/extensions/directus-extension-backup:ro
+    depends_on:
+      database:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    environment:
+      SECRET: ${DIRECTUS_SECRET:?DIRECTUS_SECRET required}
+      DB_CLIENT: pg
+      DB_HOST: database
+      DB_PORT: "5432"
+      DB_DATABASE: ${DB_DATABASE:-directus}
+      DB_USER: ${DB_USER:-directus}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD required}
+      CACHE_ENABLED: "true"
+      CACHE_STORE: redis
+      REDIS: redis://cache:6379
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?ADMIN_EMAIL required}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD required}
+      # Required for a Marketplace install (Option 2a) — the API endpoint is not
+      # sandboxed. Not needed for a from-source install. See docs/security.md.
+      # MARKETPLACE_TRUST: all
+      # Operator kill-switches, secure-by-default OFF. Set to "true" (or "1") to
+      # allow importing foreign archives / downloading backups.
+      BACKUP_IMPORT_ENABLED: ${BACKUP_IMPORT_ENABLED:-}
+      BACKUP_EXPORT_ENABLED: ${BACKUP_EXPORT_ENABLED:-}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8055/server/ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  db_data:
+  uploads:
+  extensions:
+  backups:

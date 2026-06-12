@@ -1,0 +1,84 @@
+# Self-contained stack for the standalone backup extension's integration test:
+# PostgreSQL + Redis + Directus (with the extension mounted from the built
+# package). No sidecar, no Docker socket — the restore runs in-container on the
+# next boot via the entrypoint stub + restore.sh.
+#
+# Driven by test/integration/run.sh. The extension must be built (dist/) before
+# `docker compose up`; run.sh handles that.
+
+name: directus-backup-standalone-it
+
+services:
+  database:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USER:-directus}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD required}
+      POSTGRES_DB: ${DB_DATABASE:-directus}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USER:-directus}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cache:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "[ $$(redis-cli ping) = 'PONG' ]"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  directus:
+    build: .
+    restart: unless-stopped
+    # Ephemeral host port (avoids clashing with any Directus already on 8055);
+    # run.sh discovers the mapped port via `docker compose port`.
+    ports:
+      - "8055"
+    volumes:
+      - uploads:/directus/uploads
+      - extensions:/directus/extensions
+      - backups:/directus/backups
+      # The built extension package (package.json + dist/ + scripts/).
+      - ../..:/directus/extensions/directus-extension-backup:ro
+    depends_on:
+      database:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    environment:
+      SECRET: ${DIRECTUS_SECRET:?DIRECTUS_SECRET required}
+      DB_CLIENT: pg
+      DB_HOST: database
+      DB_PORT: "5432"
+      DB_DATABASE: ${DB_DATABASE:-directus}
+      DB_USER: ${DB_USER:-directus}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD required}
+      CACHE_ENABLED: "true"
+      CACHE_STORE: redis
+      REDIS: redis://cache:6379
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?ADMIN_EMAIL required}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD required}
+      # Operator kill-switches — enabled so the import/export round-trip runs.
+      BACKUP_IMPORT_ENABLED: "true"
+      BACKUP_EXPORT_ENABLED: "true"
+      # Tight cap so the large-upload scenario proves application/gzip bypasses
+      # express.json() / MAX_PAYLOAD_SIZE while JSON bodies still hit the limit.
+      MAX_PAYLOAD_SIZE: 1mb
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8055/server/ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  db_data:
+  uploads:
+  extensions:
+  backups:

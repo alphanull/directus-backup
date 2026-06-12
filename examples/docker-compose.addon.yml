@@ -1,0 +1,45 @@
+# Adding the backup extension to an EXISTING Directus stack.
+#
+# Unlike the old sidecar, there is no separate service to add — the extension
+# runs inside Directus. "Adding" it therefore means adjusting your existing
+# `directus` service. This file is a reference snippet, not a standalone stack:
+# merge the changes below into your own docker-compose.yml.
+#
+# Four required changes to your directus service:
+#   1. Build from the extended image instead of pulling the stock one. Copy this
+#      directory's `Dockerfile` next to your Compose file (it adds
+#      pg_dump/pg_restore and embeds the boot-time restore hook).
+#   2. Add `restart: unless-stopped` — this is what brings the container back
+#      after a restore (the restore signals PID 1 to stop the container).
+#   3. Mount a backup volume at /directus/backups (BACKUP_DIR).
+#   4. Install the extension itself (Marketplace with MARKETPLACE_TRUST=all, or
+#      from source — see docs/installation.md).
+#
+# Database and cache settings are reused from your existing Directus config — no
+# extra DB credentials, and no BACKUP_SECRET / BACKUP_URL / BACKUP_TOKEN.
+
+services:
+  directus:
+    # 1. Was: image: directus/directus:11
+    build:
+      context: .              # directory holding the Dockerfile
+    # 2. Required — the restore restarts the container.
+    restart: unless-stopped
+    volumes:
+      # ...your existing uploads/extensions mounts...
+      # 3. Backup storage.
+      - backups:/directus/backups
+      # 4b. From-source install: mount the built package (run `npm run build`
+      #     in the extension directory first). Omit when installing via
+      #     Marketplace.
+      # - /path/to/directus-extension-backup:/directus/extensions/directus-extension-backup:ro
+    environment:
+      # ...your existing DB_*, CACHE/REDIS, SECRET, etc. ...
+      # 4a. Marketplace install only (the API endpoint is not sandboxed):
+      # MARKETPLACE_TRUST: all
+      # Optional — enable upload/download of backup archives (off by default):
+      BACKUP_IMPORT_ENABLED: ${BACKUP_IMPORT_ENABLED:-}
+      BACKUP_EXPORT_ENABLED: ${BACKUP_EXPORT_ENABLED:-}
+
+volumes:
+  backups:
