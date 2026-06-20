@@ -3792,7 +3792,7 @@ function registerRoutes(router, context) {
  * {@link file://./restore/restore.ts} and executed by `restore.sh` after a
  * container restart.
  * @author  Frank Kudermann – alphanull
- * @version 0.10.1
+ * @version 0.10.2
  * @license AGPL-3.0-only
  */
 let startupDone = false;

@@ -6,6 +6,12 @@ This project adheres to [Semantic Versioning](https://semver.org) and follows th
 
 ---
 
+## [0.10.2] – 2026-06-20
+
+### Added
+
+- new discontinuation message in readme
+
 ## [0.10.1] – 2026-06-12
 
 ### fixed

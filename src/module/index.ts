@@ -2,7 +2,7 @@
  * Backup module registration — exposes the Backup UI in the Directus sidebar.
  * Visible to admins and users with the "Backup Access" policy.
  * @author  Frank Kudermann – alphanull
- * @version 0.10.1
+ * @version 0.10.2
  * @license AGPL-3.0-only
  */
 

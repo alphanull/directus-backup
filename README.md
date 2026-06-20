@@ -1,5 +1,7 @@
 # Directus Backup
 
+> ‼️ **DISCONTINUED** — This project has been discontinued and is no longer actively maintained. As I have decided to move away from Directus for future projects, no further development, feature requests, bug fixes, or compatibility updates are planned. The repository will remain available readonly for reference and for existing users, at least for some time. Feel free to clone it, fork it, or build upon it.
+
 Full backup and restore system for Directus. Create, schedule, download, upload, and restore backups through a UI module in Directus Studio — running **entirely inside Directus**, with no sidecar container and no Docker socket access.
 
 ## Features
@@ -38,7 +40,7 @@ This restart-based mechanism is why the deployment needs a custom entrypoint and
 
 ## Before You Start
 
-> ‼️ **WARNING - Beta Software** — This project is under active development and has not been tested across all possible configurations and environments. It is **not recommended** to run this directly in a production environment without prior testing in a staging setup. Feedback, bug reports, and contributions are very welcome and greatly appreciated.
+> ‼️ **WARNING - Beta Software** — This project is not under active development anymore and has not been tested across all possible configurations and environments. It is **not recommended** to run this directly in a production environment without prior testing in a staging setup. Feedback, bug reports, and contributions are very welcome and greatly appreciated.
 
 > ‼️ **IMPORTANT** - The API endpoint uses **direct database access** for authorization and **spawns a child process** for backups, so it is **not sandboxed**. A Marketplace install therefore requires `MARKETPLACE_TRUST=all` on self-hosted instances; Directus Cloud does not allow this and is not supported. `BACKUP_IMPORT_ENABLED` and `BACKUP_EXPORT_ENABLED` have security implications and are disabled by default for a reason — see [Security](https://github.com/alphanull/directus-backup/blob/main/docs/security.md).
 
@@ -85,7 +87,7 @@ volumes:
 
 The stock Directus image has no Dockerfile and does not ship `pg_dump`/`pg_restore`, and the restore must run on a clean boot **before** Directus starts (see [Architecture](https://github.com/alphanull/directus-backup/blob/main/docs/architecture.md#restore-data-flow)). Therefore, first check whether there is already a `Dockerfile` next to the Compose file from step 1.
 
-- **No existing Dockerfile:** copy [`examples/Dockerfile`](https://github.com/alphanull/directus-backup/blob/main/examples/Dockerfile) into that folder. If your Compose file used a different Directus image tag, update the `FROM directus/directus:...` line to the same Directus version.
+- **No existing Dockerfile:** copy `[examples/Dockerfile](https://github.com/alphanull/directus-backup/blob/main/examples/Dockerfile)` into that folder. If your Compose file used a different Directus image tag, update the `FROM directus/directus:...` line to the same Directus version.
 - **Existing Dockerfile:** do not replace it blindly. Merge the required parts instead: install the PostgreSQL client as `root`, add the restore entrypoint logic before Directus starts, create `/directus/backups` with `node` ownership, and preserve any existing `ENTRYPOINT`/`CMD` behavior. See the detailed [Installation guide](https://github.com/alphanull/directus-backup/blob/main/docs/installation.md#step-2--add-the-dockerfile).
 
 ### 3. Install the extension
